@@ -1,6 +1,5 @@
 //
-// Example plugin: it just swaps the blue and green color component
-// values for each pixel in the source image.
+// Example plugin: mirror horizontal by switching the pixels of the left and right functions
 //
 
 #include <stdlib.h>
@@ -13,11 +12,11 @@ struct Arguments {
 };
 
 const char *get_plugin_name(void) {
-        return "swapbg";
+        return "mirrorh";
 }
 
 const char *get_plugin_desc(void) {
-        return "swap blue and green color component values";
+        return "flip the image horizontally";
 }
 
 void *parse_arguments(int num_args, char *args[]) {
@@ -30,28 +29,27 @@ void *parse_arguments(int num_args, char *args[]) {
 }
 
 // Helper function to swap the blue and green color component values.
-static uint32_t swap_bg(uint32_t pix) {
-        uint8_t r, g, b, a;
-        img_unpack_pixel(pix, &r, &g, &b, &a);
-        return img_pack_pixel(r, b, g, a);
-}
+
 
 struct Image *transform_image(struct Image *source, void *arg_data) {
-        //struct Arguments *args = arg_data;
+        struct Arguments *args = arg_data;
 
         // Allocate a result Image
         struct Image *out = img_create(source->width, source->height);
-        //if (!out) {
-        //        free(args);
-        //        return NULL;
-        //}
+        if (!out) {
+                free(args);
+                return NULL;
+        }
 
-        //unsigned num_pixels = source->width * source->height;
-        //for (unsigned i = 0; i < num_pixels; i++) {
-        //        out->data[i] = swap_bg(source->data[i]);
-        //}
+        unsigned amount_of_pixels_width = source->width;
+	unsigned amount_of_pixels_height = source->height;
+        for (unsigned i = 0; i < amount_of_pixels_height; i++) {
+               for(unsigned j = 0; j < amount_of_width; j++) {
+                     out->data[source->width * i + j] = source->data[source->width * i + (source->width - 1 - j)];
+	       }
+        }
 
-        //free(args);
+        free(args);
 
         return out;
 }

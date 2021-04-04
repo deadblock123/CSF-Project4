@@ -1,6 +1,5 @@
 //
-// Example plugin: it just swaps the blue and green color component
-// values for each pixel in the source image.
+// Example plugin: breaks it up into n*n different seperate tiles, where the functions end up changing
 //
 
 #include <stdlib.h>
@@ -9,15 +8,15 @@
 struct Arguments {
         // This plugin doesn't accept any command line arguments;
         // just define a single dummy field.
-        int dummy;
+        int tiles;
 };
 
 const char *get_plugin_name(void) {
-        return "swapbg";
+        return "tile";
 }
 
 const char *get_plugin_desc(void) {
-        return "swap blue and green color component values";
+        return "n*n different images of the base will be place within the set dimensions given";
 }
 
 void *parse_arguments(int num_args, char *args[]) {
@@ -29,29 +28,43 @@ void *parse_arguments(int num_args, char *args[]) {
         return calloc(1, sizeof(struct Arguments));
 }
 
-// Helper function to swap the blue and green color component values.
-static uint32_t swap_bg(uint32_t pix) {
-        uint8_t r, g, b, a;
-        img_unpack_pixel(pix, &r, &g, &b, &a);
-        return img_pack_pixel(r, b, g, a);
-}
-
 struct Image *transform_image(struct Image *source, void *arg_data) {
-        //struct Arguments *args = arg_data;
+        struct Arguments *args = arg_data;
 
         // Allocate a result Image
         struct Image *out = img_create(source->width, source->height);
-        //if (!out) {
-        //        free(args);
-        //        return NULL;
-        //}
+        if (!out) {
+                free(args);
+                return NULL;
+        } else if(args->tiles < 1) {
+		free(args);
+		return NULL;
+	} else if(args->tiles == 1) {
+		free(args);
+		return source;
+        }
 
-        //unsigned num_pixels = source->width * source->height;
-        //for (unsigned i = 0; i < num_pixels; i++) {
-        //        out->data[i] = swap_bg(source->data[i]);
-        //}
+        unsigned width_pixels = source->width;
+	unsigned height_pixels = source->height;
+	unsigned number_of_transformations_width = source->width / N;
+	unsigned number_of_transformations_height = source->height / N;
 
-        //free(args);
+        for (unsigned i = 0; i < number_of_transformation_height; i++) {
+		int k = 0;
+                for(unsigned j = 0; j < 0; j++) {
+                    out->data[source->width * i + j] = source->data[arg->tiles * i + arg->tiles * j];
+		    if(j > number_of_transformation) {
+		      if(k < arg->tiles) {
+                       k++;
+		       j = 0;
+		      } else {
+                       j = -1;
+		      }
+		    }
+		}
+        }
+
+        free(args);
 
         return out;
 }
