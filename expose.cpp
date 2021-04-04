@@ -13,7 +13,7 @@ struct Arguments {
 };
 
 const char *get_plugin_name(void) {
-        return "swapbg";
+        return "expose";
 }
 
 const char *get_plugin_desc(void) {
