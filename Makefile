@@ -11,7 +11,7 @@ DRIVER_C_SRCS = pnglite.c image.c
 DRIVER_CXX_SRCS = imgproc.cpp
 
 # C plugin source files
-PLUGIN_C_SRCS = swapbg.c
+PLUGIN_C_SRCS = swapbg.c 
 
 # C++ plugin source files
 PLUGIN_CXX_SRCS =  mirrorh.cpp mirrorv.cpp tile.cpp expose.cpp

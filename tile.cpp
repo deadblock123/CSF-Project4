@@ -3,6 +3,7 @@
 //
 
 #include <stdlib.h>
+#include <iostream>
 #include "image_plugin.h"
 
 struct Arguments {
@@ -20,12 +21,11 @@ const char *get_plugin_desc(void) {
 }
 
 void *parse_arguments(int num_args, char *args[]) {
-        (void) args; // this is just to avoid a warning about an unused parameter
+        struct Arguments *arguments = (struct Arguments *) malloc(sizeof(struct Arguments));
 
-        if (num_args != 0) {
-                return NULL;
-        }
-        return calloc(1, sizeof(struct Arguments));
+	arguments->tiles = atof(args[num_args-1]);
+
+	return arguments;
 }
 
 struct Image *transform_image(struct Image *source, void *arg_data) {
@@ -47,20 +47,25 @@ struct Image *transform_image(struct Image *source, void *arg_data) {
 	unsigned number_of_transformations_width = source->width / args->tiles;
 	unsigned number_of_transformations_height = source->height / args->tiles;
 
-        for (unsigned i = 0; i < number_of_transformations_height; i++) {
-		int k = 0;
-                for(unsigned j = 0; j > 0; j++) {
-                    out->data[source->width * i + j] = source->data[args->tiles * i + args->tiles * j];
-		    if(j >= number_of_transformations_width) {
-		      if(k < args->tiles) {
-                       k++;
-		       j = 0;
-		      } else {
-                       j = -1;
-		      }
+	int values[number_of_transformations_height][number_of_transformations_width];
+	for(int n = 0; n < (int) number_of_transformations_height; n++) {
+		for(int m = 0; m < (int) number_of_transformations_width; m++) {
+                         values[n][m] = source->data[n * source->width * args->tiles + m * args->tiles];
+
+		}
+	}
+
+	int placement = 0;
+	for(int i = 0; i < args->tiles; i++) {
+	    for(int k = 0; k < (int) number_of_transformations_height; k++) {
+		for(int j = 0; j < args->tiles; j++) {
+                    for(int l = 0; l < (int) number_of_transformations_width; l++) {
+		       out->data[placement] = values[k][l];
+		       placement++;
 		    }
 		}
-        }
+	    }
+	}
 
         free(args);
 

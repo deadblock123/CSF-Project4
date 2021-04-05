@@ -3,10 +3,11 @@
 //
 
 #include <stdlib.h>
+#include <iostream>
 #include "image_plugin.h"
 
 struct Arguments {
-        float exposureRadius;
+        double exposureRadius;
 };
 
 const char *get_plugin_name(void) {
@@ -18,16 +19,16 @@ const char *get_plugin_desc(void) {
 }
 
 void *parse_arguments(int num_args, char *args[]) {
-        (void) args; 
 
-        if (num_args != 0) {
-                return NULL;
-        }
-        return calloc(1, sizeof(struct Arguments));
+	struct Arguments *arguments = (struct Arguments *) malloc(sizeof(struct Arguments));
+	
+	arguments->exposureRadius = atof(args[num_args-1]);
+
+        return arguments;
 }
 
 uint8_t exposedValues(float exposureValue, uint8_t color) {
-	return exposureValue * color > 255 ? 255 : (uint8_t) exposureValue * color;
+	return exposureValue * color > 255 ? 255 : (uint8_t) (exposureValue * color);
 }
 
 // Helper function to swap the blue and green color component values.
@@ -40,6 +41,7 @@ static uint32_t exposure(uint32_t pix, float expVal) {
 struct Image *transform_image(struct Image *source, void *arg_data) {
         struct Arguments *args = (struct Arguments *) arg_data;
         
+
         // Allocate a result Image
         struct Image *out = img_create(source->width, source->height);
         if (!out) {
