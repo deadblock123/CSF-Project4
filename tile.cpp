@@ -29,7 +29,7 @@ void *parse_arguments(int num_args, char *args[]) {
 }
 
 struct Image *transform_image(struct Image *source, void *arg_data) {
-        struct Arguments *args = arg_data;
+        struct Arguments *args = (struct Arguments *) arg_data;
 
         // Allocate a result Image
         struct Image *out = img_create(source->width, source->height);
@@ -44,17 +44,15 @@ struct Image *transform_image(struct Image *source, void *arg_data) {
 		return source;
         }
 
-        unsigned width_pixels = source->width;
-	unsigned height_pixels = source->height;
-	unsigned number_of_transformations_width = source->width / N;
-	unsigned number_of_transformations_height = source->height / N;
+	unsigned number_of_transformations_width = source->width / args->tiles;
+	unsigned number_of_transformations_height = source->height / args->tiles;
 
-        for (unsigned i = 0; i < number_of_transformation_height; i++) {
+        for (unsigned i = 0; i < number_of_transformations_height; i++) {
 		int k = 0;
-                for(unsigned j = 0; j < 0; j++) {
-                    out->data[source->width * i + j] = source->data[arg->tiles * i + arg->tiles * j];
-		    if(j > number_of_transformation) {
-		      if(k < arg->tiles) {
+                for(unsigned j = 0; j > 0; j++) {
+                    out->data[source->width * i + j] = source->data[args->tiles * i + args->tiles * j];
+		    if(j >= number_of_transformations_width) {
+		      if(k < args->tiles) {
                        k++;
 		       j = 0;
 		      } else {

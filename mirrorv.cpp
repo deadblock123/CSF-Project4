@@ -29,7 +29,7 @@ void *parse_arguments(int num_args, char *args[]) {
 }
 
 struct Image *transform_image(struct Image *source, void *arg_data) {
-        struct Arguments *args = arg_data;
+        struct Arguments *args = (struct Arguments *) arg_data;
 
         // Allocate a result Image
         struct Image *out = img_create(source->width, source->height);
@@ -40,7 +40,7 @@ struct Image *transform_image(struct Image *source, void *arg_data) {
 
         unsigned amount_of_pixels_width = source->width;
 	unsigned amount_of_pixels_height = source->height;
-        for(unsigned i = 0; i < amount_of_pixels_he:ight; i++) {
+        for(unsigned i = 0; i < amount_of_pixels_height; i++) {
 		for(unsigned j = 0; j < amount_of_pixels_width; j++) {
                     out->data[source->width * i + j] = source->data[(((source->height - 1 - i) * source->width) + j)];
 		}
