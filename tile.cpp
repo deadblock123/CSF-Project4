@@ -44,8 +44,8 @@ struct Image *transform_image(struct Image *source, void *arg_data) {
 		return source;
         }
 
-	unsigned number_of_transformations_width = source->width / args->tiles;
-	unsigned number_of_transformations_height = source->height / args->tiles;
+	unsigned number_of_transformations_width = (source->width + args->tiles- 1) / args->tiles;
+	unsigned number_of_transformations_height = (source->height + args->tiles- 1) / args->tiles;
 
 	int values[number_of_transformations_height][number_of_transformations_width];
 	for(int n = 0; n < (int) number_of_transformations_height; n++) {
@@ -54,8 +54,19 @@ struct Image *transform_image(struct Image *source, void *arg_data) {
 
 		}
 	}
+	
+	int tileX;
+	int tileY;
+	for (int x = 0; x < source->width; x++) {
+		for (int y = 0; y < source->height; y++) { 
+			tileX = x % number_of_transformations_width;
+			tileY = y % number_of_transformations_height;
 
-	int placement = 0;
+			out->data[(y * source->width) + x] = values[tileY][tileX];
+		}
+	}
+
+	/*int placement = 0;
 	for(int i = 0; i < args->tiles; i++) {
 	    for(int k = 0; k < (int) number_of_transformations_height; k++) {
 		for(int j = 0; j < args->tiles; j++) {
@@ -65,7 +76,7 @@ struct Image *transform_image(struct Image *source, void *arg_data) {
 		    }
 		}
 	    }
-	}
+	}*/
 
         free(args);
 
