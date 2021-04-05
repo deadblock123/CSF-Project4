@@ -19,16 +19,20 @@ int main(int argc, char** argv) {
 	DIR *dirp;
 	struct dirent *dp;
 
-	dirp = opendir("./plugins");
+	char * pluginDirectory = getenv("PLUGIN_DIR");
+	if (pluginDirectory == NULL) {
+		pluginDirectory = "./plugins";
+	}
+	dirp = opendir(pluginDirectory);
 
 	std::vector<struct Plugin*> pluginList;
 	
 	while((dp = readdir(dirp)) != NULL) {
 		struct Plugin * newPlugin = (struct Plugin *)malloc(sizeof(struct Plugin));
 		std::string nameOfLibrary(dp->d_name);
-
+	
 		if (nameOfLibrary.length() > 3 && nameOfLibrary.substr(nameOfLibrary.length() - 3) == ".so") {
-			newPlugin->handle = dlopen((std::string("./plugins/")+std::string(dp->d_name)).c_str(), RTLD_LAZY);
+			newPlugin->handle = dlopen((std::string(pluginDirectory)+std::string("/")+std::string(dp->d_name)).c_str(), RTLD_LAZY);
           		//check for null
 			*(void **)(&newPlugin->get_plugin_name) = dlsym(newPlugin->handle, "get_plugin_name");
 			*(void **)(&newPlugin->get_plugin_desc) = dlsym(newPlugin->handle, "get_plugin_desc");
