@@ -34,7 +34,6 @@ int main(int argc, char** argv) {
 	
 		if (nameOfLibrary.length() > 3 && nameOfLibrary.substr(nameOfLibrary.length() - 3) == ".so") {
 			newPlugin->handle = dlopen((std::string(pluginDirectory)+std::string("/")+std::string(dp->d_name)).c_str(), RTLD_LAZY);
-          		//check for null
 			*(void **)(&newPlugin->get_plugin_name) = dlsym(newPlugin->handle, "get_plugin_name");
 			*(void **)(&newPlugin->get_plugin_desc) = dlsym(newPlugin->handle, "get_plugin_desc");
 			*(void **)(&newPlugin->parse_arguments) = dlsym(newPlugin->handle, "parse_arguments");
@@ -72,15 +71,26 @@ int main(int argc, char** argv) {
 
 		for (unsigned i = 0; i < pluginList.size(); i++) {
 			if (requestedPlugin.compare(pluginList.at(i)->get_plugin_name()) == 0) {
-				Image * output = pluginList.at(i)->transform_image(img_read_png(inputImage.c_str()), pluginList.at(i)->parse_arguments(argc, argv));
+				
+				if ( pluginList.at(i)->parse_arguments(argc - 5, argv + 5) == NULL) {
+					std::cout << "ERROR: wrong amount of plugin parameters";
+					exit (1);	
+				}
+
+				Image * output = pluginList.at(i)->transform_image(img_read_png(inputImage.c_str()), pluginList.at(i)->parse_arguments(argc - 5, argv + 5));
 				img_write_png(output, outputImage.c_str());
 				return 0;		
 			}
 		}
-		//throw error for second parameter
+
+		std::cout << "ERROR: not an availible plugin";
+                exit (1);
 	}
 	else {
-	//throw error for first parameter
+	
+		std::cout << "ERROR: not an availible command";
+                exit (1);
+
 	}
 
 }

@@ -21,7 +21,11 @@ const char *get_plugin_desc(void) {
 void *parse_arguments(int num_args, char *args[]) {
         struct Arguments *arguments = (struct Arguments *) malloc(sizeof(struct Arguments));
 
-	arguments->tiles = atof(args[num_args-1]);
+	if (num_args != 1) {
+		return NULL;
+	}
+
+	arguments->tiles = atoi(args[0]);
 
 	return arguments;
 }

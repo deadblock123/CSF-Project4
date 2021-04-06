@@ -21,8 +21,12 @@ const char *get_plugin_desc(void) {
 void *parse_arguments(int num_args, char *args[]) {
 
 	struct Arguments *arguments = (struct Arguments *) malloc(sizeof(struct Arguments));
-	
-	arguments->exposureRadius = atof(args[num_args-1]);
+
+	if (num_args != 1) {
+                return NULL;
+        }
+
+	arguments->exposureRadius = atof(args[0]);
 
         return arguments;
 }
@@ -40,8 +44,6 @@ static uint32_t exposure(uint32_t pix, float expVal) {
 struct Image *transform_image(struct Image *source, void *arg_data) {
         struct Arguments *args = (struct Arguments *) arg_data;
         
-
-        // Allocate a result Image
         struct Image *out = img_create(source->width, source->height);
         if (!out) {
                 free(args);
