@@ -16,7 +16,7 @@ const char *get_plugin_name(void) {
 }
 
 const char *get_plugin_desc(void) {
-        return "flip the image horizontally";
+        return "mirror image horizontally";
 }
 
 void *parse_arguments(int num_args, char *args[]) {
@@ -28,13 +28,10 @@ void *parse_arguments(int num_args, char *args[]) {
         return calloc(1, sizeof(struct Arguments));
 }
 
-// Helper function to swap the blue and green color component values.
-
 
 struct Image *transform_image(struct Image *source, void *arg_data) {
         struct Arguments *args = (struct Arguments *) arg_data;
 
-        // Allocate a result Image
         struct Image *out = img_create(source->width, source->height);
         if (!out) {
                 free(args);

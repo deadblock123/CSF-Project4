@@ -3,6 +3,7 @@
 #include <vector>
 #include <dirent.h>
 #include <dlfcn.h>
+#include <iomanip>
 #include "pnglite.h"
 #include "image.h"
 
@@ -53,13 +54,13 @@ int main(int argc, char** argv) {
 		
 		struct Plugin * currentPlugin;
 			
+		std::cout << "Loaded " << pluginList.size() << " plugin(s)\n";
 		while (pluginList.empty() == 0) {
 			currentPlugin = pluginList.back();
 			pluginList.pop_back();
-			std::cout << currentPlugin->get_plugin_name();
-			std::cout << "\n";
+			std::cout << std::setw(8) << currentPlugin->get_plugin_name();
+			std::cout << ": ";
 			std::cout << currentPlugin->get_plugin_desc();
-			std::cout << "\n";
 			std::cout << "\n";
 
 		}

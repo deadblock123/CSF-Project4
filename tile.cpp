@@ -7,8 +7,6 @@
 #include "image_plugin.h"
 
 struct Arguments {
-        // This plugin doesn't accept any command line arguments;
-        // just define a single dummy field.
         int tiles;
 };
 
@@ -17,7 +15,7 @@ const char *get_plugin_name(void) {
 }
 
 const char *get_plugin_desc(void) {
-        return "n*n different images of the base will be place within the set dimensions given";
+        return "tile source image in an NxN arrangement";
 }
 
 void *parse_arguments(int num_args, char *args[]) {
@@ -65,18 +63,6 @@ struct Image *transform_image(struct Image *source, void *arg_data) {
 			out->data[(y * source->width) + x] = values[tileY][tileX];
 		}
 	}
-
-	/*int placement = 0;
-	for(int i = 0; i < args->tiles; i++) {
-	    for(int k = 0; k < (int) number_of_transformations_height; k++) {
-		for(int j = 0; j < args->tiles; j++) {
-                    for(int l = 0; l < (int) number_of_transformations_width; l++) {
-		       out->data[placement] = values[k][l];
-		       placement++;
-		    }
-		}
-	    }
-	}*/
 
         free(args);
 

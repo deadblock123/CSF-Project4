@@ -15,7 +15,7 @@ const char *get_plugin_name(void) {
 }
 
 const char *get_plugin_desc(void) {
-        return "change the exposure values of pixels";
+        return "adjust the intensity of all pixels";
 }
 
 void *parse_arguments(int num_args, char *args[]) {
@@ -31,7 +31,6 @@ uint8_t exposedValues(float exposureValue, uint8_t color) {
 	return exposureValue * color > 255 ? 255 : (uint8_t) (exposureValue * color);
 }
 
-// Helper function to swap the blue and green color component values.
 static uint32_t exposure(uint32_t pix, float expVal) {
         uint8_t r, g, b, a;
         img_unpack_pixel(pix, &r, &g, &b, &a);
