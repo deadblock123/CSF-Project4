@@ -82,18 +82,21 @@ int main(int argc, char** argv) {
 
 		for (unsigned i = 0; i < pluginList.size(); i++) {
 			if (requestedPlugin.compare(pluginList.at(i)->get_plugin_name()) == 0) {
-				
-				if ( pluginList.at(i)->parse_arguments(argc - 5, argv + 5) == NULL) {
+				struct Arguments* parsedArguments = (struct Arguments *) pluginList.at(i)->parse_arguments(argc - 5, argv + 5);
+				if (parsedArguments == NULL) {
 					std::cout << "ERROR: wrong amount of plugin parameters";
+					free(parsedArguments);
 					free(dirp);
 					exit (1);	
 				}
 				Image * inputImagePointer = img_read_png(inputImage.c_str());
 				Image * output = pluginList.at(i)->transform_image(inputImagePointer, pluginList.at(i)->parse_arguments(argc - 5, argv + 5));
 				img_write_png(output, outputImage.c_str());
+				free(inputImagePointer->data);
 				free(inputImagePointer);
 				free(output->data);
 				free(output);
+				free(parsedArguments);
 
 				while (pluginList.empty() == 0) {
                         		free(pluginList.back());
