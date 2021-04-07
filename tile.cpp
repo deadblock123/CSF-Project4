@@ -33,7 +33,6 @@ void *parse_arguments(int num_args, char *args[]) {
 struct Image *transform_image(struct Image *source, void *arg_data) {
         struct Arguments *args = (struct Arguments *) arg_data;
 
-        // Allocate a result Image
         struct Image *out = img_create(source->width, source->height);
         if (!out) {
                 free(args);

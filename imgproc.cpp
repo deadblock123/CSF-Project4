@@ -77,9 +77,10 @@ int main(int argc, char** argv) {
 					free(dirp);
 					exit (1);	
 				}
-
-				Image * output = pluginList.at(i)->transform_image(img_read_png(inputImage.c_str()), pluginList.at(i)->parse_arguments(argc - 5, argv + 5));
+				Image * inputImagePointer = img_read_png(inputImage.c_str());
+				Image * output = pluginList.at(i)->transform_image(inputImagePointer, pluginList.at(i)->parse_arguments(argc - 5, argv + 5));
 				img_write_png(output, outputImage.c_str());
+				free(inputImagePointer);
 				free(output->data);
 				free(output);
 				free(dirp);
