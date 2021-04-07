@@ -16,6 +16,7 @@ struct Plugin {
 	struct Image *(*transform_image)(struct Image *source, void *arg_data);
 };
 
+
 int main(int argc, char** argv) {
 	DIR *dirp;
 	struct dirent *dp;
@@ -40,7 +41,6 @@ int main(int argc, char** argv) {
 			*(void **)(&newPlugin->transform_image) = dlsym(newPlugin->handle, "transform_image");
 			pluginList.push_back(newPlugin);
 		}
-
 	}
 
 	if (argc < 2) {
@@ -74,21 +74,27 @@ int main(int argc, char** argv) {
 				
 				if ( pluginList.at(i)->parse_arguments(argc - 5, argv + 5) == NULL) {
 					std::cout << "ERROR: wrong amount of plugin parameters";
+					free(dirp);
 					exit (1);	
 				}
 
 				Image * output = pluginList.at(i)->transform_image(img_read_png(inputImage.c_str()), pluginList.at(i)->parse_arguments(argc - 5, argv + 5));
 				img_write_png(output, outputImage.c_str());
+				free(output->data);
+				free(output);
+				free(dirp);
 				return 0;		
 			}
 		}
 
 		std::cout << "ERROR: not an availible plugin";
+		free(dirp);
                 exit (1);
 	}
 	else {
 	
 		std::cout << "ERROR: not an availible command";
+		free(dirp);
                 exit (1);
 
 	}
