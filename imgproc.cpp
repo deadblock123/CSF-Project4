@@ -30,10 +30,10 @@ int main(int argc, char** argv) {
 	std::vector<struct Plugin*> pluginList;
 	
 	while((dp = readdir(dirp)) != NULL) {
-		struct Plugin * newPlugin = (struct Plugin *)malloc(sizeof(struct Plugin));
 		std::string nameOfLibrary(dp->d_name);
 	
 		if (nameOfLibrary.length() > 3 && nameOfLibrary.substr(nameOfLibrary.length() - 3) == ".so") {
+			struct Plugin * newPlugin = (struct Plugin *)malloc(sizeof(struct Plugin));
 			newPlugin->handle = dlopen((std::string(pluginDirectory)+std::string("/")+std::string(dp->d_name)).c_str(), RTLD_LAZY);
 			*(void **)(&newPlugin->get_plugin_name) = dlsym(newPlugin->handle, "get_plugin_name");
 			*(void **)(&newPlugin->get_plugin_desc) = dlsym(newPlugin->handle, "get_plugin_desc");
@@ -43,11 +43,19 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	closedir(dirp);
+
 	if (argc < 2) {
 		std::cout << "Usage: imgproc <command> [<command args...>]\n";
 		std::cout << "Commands are:\n";
 		std::cout << "list\n";
 		std::cout << "exec <plugin> <input img> <output img> [<plugin args>]\n";
+
+		while (pluginList.empty() == 0) {
+                        free(pluginList.back());
+			pluginList.pop_back();
+                }
+
 	}
 	else if (std::string(argv[1]).compare("list") == 0) { 
 		
@@ -56,13 +64,16 @@ int main(int argc, char** argv) {
 		std::cout << "Loaded " << pluginList.size() << " plugin(s)\n";
 		while (pluginList.empty() == 0) {
 			currentPlugin = pluginList.back();
-			pluginList.pop_back();
+
 			std::cout << std::setw(8) << currentPlugin->get_plugin_name();
 			std::cout << ": ";
 			std::cout << currentPlugin->get_plugin_desc();
 			std::cout << "\n";
 
+			pluginList.pop_back();
+			free(currentPlugin);
 		}
+
 	}
 	else if (std::string(argv[1]).compare("exec") == 0) {
 		std::string requestedPlugin(argv[2]);
@@ -83,19 +94,32 @@ int main(int argc, char** argv) {
 				free(inputImagePointer);
 				free(output->data);
 				free(output);
-				free(dirp);
-				return 0;		
+
+				while (pluginList.empty() == 0) {
+                        		free(pluginList.back());
+                        		pluginList.pop_back();
+		                }
+
+				return 0;	
 			}
 		}
 
+		while (pluginList.empty() == 0) {
+			free(pluginList.back());
+			pluginList.pop_back();
+                }
+
 		std::cout << "ERROR: not an availible plugin";
-		free(dirp);
                 exit (1);
 	}
 	else {
+		while (pluginList.empty() == 0) {
+                        free(pluginList.back());
+                        pluginList.pop_back();
+                }
+
 	
 		std::cout << "ERROR: not an availible command";
-		free(dirp);
                 exit (1);
 
 	}
