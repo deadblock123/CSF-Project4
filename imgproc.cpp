@@ -30,10 +30,11 @@ int main(int argc, char** argv) {
 	std::vector<struct Plugin*> pluginList;
 	
 	while((dp = readdir(dirp)) != NULL) {
-		struct Plugin * newPlugin = (struct Plugin *)malloc(sizeof(struct Plugin));
 		std::string nameOfLibrary(dp->d_name);
 	
 		if (nameOfLibrary.length() > 3 && nameOfLibrary.substr(nameOfLibrary.length() - 3) == ".so") {
+			struct Plugin * newPlugin = malloc(sizeof(struct Plugin));
+
 			newPlugin->handle = dlopen((std::string(pluginDirectory)+std::string("/")+std::string(dp->d_name)).c_str(), RTLD_LAZY);
 			*(void **)(&newPlugin->get_plugin_name) = dlsym(newPlugin->handle, "get_plugin_name");
 			*(void **)(&newPlugin->get_plugin_desc) = dlsym(newPlugin->handle, "get_plugin_desc");
@@ -56,12 +57,14 @@ int main(int argc, char** argv) {
 		std::cout << "Loaded " << pluginList.size() << " plugin(s)\n";
 		while (pluginList.empty() == 0) {
 			currentPlugin = pluginList.back();
+			
 			pluginList.pop_back();
 			std::cout << std::setw(8) << currentPlugin->get_plugin_name();
 			std::cout << ": ";
 			std::cout << currentPlugin->get_plugin_desc();
 			std::cout << "\n";
-
+			
+			free(currentPlugin);
 		}
 	}
 	else if (std::string(argv[1]).compare("exec") == 0) {
@@ -71,19 +74,22 @@ int main(int argc, char** argv) {
 
 		for (unsigned i = 0; i < pluginList.size(); i++) {
 			if (requestedPlugin.compare(pluginList.at(i)->get_plugin_name()) == 0) {
-				
-				if ( pluginList.at(i)->parse_arguments(argc - 5, argv + 5) == NULL) {
+				struct Arguments* parsedArguments = (struct Arguments *) pluginList.at(i)->parse_arguments(argc - 5, argv + 5);
+				if (parsedArguments == NULL) {
 					std::cout << "ERROR: wrong amount of plugin parameters";
+					free(parsedArguments);
 					free(dirp);
 					exit (1);	
 				}
 				Image * inputImagePointer = img_read_png(inputImage.c_str());
 				Image * output = pluginList.at(i)->transform_image(inputImagePointer, pluginList.at(i)->parse_arguments(argc - 5, argv + 5));
 				img_write_png(output, outputImage.c_str());
+				free(inputImagePointer->data);
 				free(inputImagePointer);
 				free(output->data);
 				free(output);
 				free(dirp);
+				free(parsedArguments);
 				return 0;		
 			}
 		}
