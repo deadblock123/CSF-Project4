@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
 		for (unsigned i = 0; i < pluginList.size(); i++) {
 			if (requestedPlugin.compare(pluginList.at(i)->get_plugin_name()) == 0) {
 				struct Arguments* parsedArguments = (struct Arguments *) pluginList.at(i)->parse_arguments(argc - 5, argv + 5);
-				if (parsedArguments == NULL) {
+				if (pluginList.at(i)->parse_arguments(argc - 5, argv + 5) == NULL) {
 					free(parsedArguments);
 					free(dirp);
 
