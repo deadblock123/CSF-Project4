@@ -84,9 +84,15 @@ int main(int argc, char** argv) {
 			if (requestedPlugin.compare(pluginList.at(i)->get_plugin_name()) == 0) {
 				struct Arguments* parsedArguments = (struct Arguments *) pluginList.at(i)->parse_arguments(argc - 5, argv + 5);
 				if (parsedArguments == NULL) {
-					std::cout << "ERROR: wrong amount of plugin parameters";
 					free(parsedArguments);
 					free(dirp);
+
+					while (pluginList.empty() == 0) {
+                                        	free(pluginList.back());
+                                        	pluginList.pop_back();
+                                	}
+
+					std::cout << "ERROR: wrong amount of plugin parameters";
 					exit (1);	
 				}
 				Image * inputImagePointer = img_read_png(inputImage.c_str());
